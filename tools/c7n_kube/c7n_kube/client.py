@@ -29,10 +29,6 @@ class Session(object):
         client_config = Configuration()
         config.load_kube_config(self.config_file, client_configuration=client_config)
         client_config.proxy = self.http_proxy
-        # TODO
-        # TODO Make Verify SSL configurable.
-        # TODO
-        client_config.verify_ssl = False
         api_client = ApiClient(configuration=client_config)
         log.info('connecting to %s' % (api_client.configuration.host))
         # e.g. client.CoreV1Api()
