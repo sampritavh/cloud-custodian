@@ -32,6 +32,7 @@ setup(
             'kube = c7n_kube.entry:initialize_kube']
     },
     install_requires=[
-        "c7n"
+        "c7n",
+        "kubernetes==6.0.0"
     ]
 )
