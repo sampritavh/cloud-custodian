@@ -22,6 +22,7 @@ import logging
 
 log = logging.getLogger('custodian.kube')
 
+
 @clouds.register('kube')
 class Kubernetes(Provider):
 

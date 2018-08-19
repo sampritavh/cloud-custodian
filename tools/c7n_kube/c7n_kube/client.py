@@ -20,6 +20,7 @@ from kubernetes.client import Configuration, ApiClient
 
 log = logging.getLogger('c7n_kube.client')
 
+
 class Session(object):
     def __init__(self, config_file=None):
         self.config_file = config_file

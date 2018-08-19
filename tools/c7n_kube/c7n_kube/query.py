@@ -23,6 +23,7 @@ from c7n.utils import local_session
 
 log = logging.getLogger('c7n_kube.query')
 
+
 class ResourceQuery(object):
     def __init__(self, session_factory):
         self.session_factory = session_factory

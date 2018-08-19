@@ -15,9 +15,10 @@
 import logging
 
 import c7n_kube.resources.namespace
-import c7n_kube.resources.service
+import c7n_kube.resources.service  # NOQA
 
 log = logging.getLogger('custodian.kube')
+
 
 def initialize_kube():
     log.info('initialize_kube')
