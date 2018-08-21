@@ -22,7 +22,7 @@ class Service(QueryResourceManager):
     class resource_type(TypeInfo):
         group = 'Core'
         version = 'V1'
-        enum_spec = ('list_service_for_all_namespaces', 'items', {'watch': False})
+        enum_spec = ('list_service_for_all_namespaces', 'items', None)
 
 
 @Service.action_registry.register('label')

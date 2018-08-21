@@ -26,7 +26,7 @@ class Namespace(QueryResourceManager):
     class resource_type(TypeInfo):
         group = 'Core'
         version = 'V1'
-        enum_spec = ('list_namespace', 'items', {'watch': False})
+        enum_spec = ('list_namespace', 'items', None)
 
 
 @Namespace.action_registry.register('delete')
