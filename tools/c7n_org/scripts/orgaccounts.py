@@ -43,7 +43,7 @@ def main(role, ou, assume, profile, output, region, active):
     accounts.
     """
 
-    client = get_ou_client(assume,profile)
+    client = get_org_client(assume,profile)
     accounts = []
     for path in ou:
         ou = get_ou_from_path(client, path)
@@ -73,7 +73,7 @@ def main(role, ou, assume, profile, output, region, active):
         file=output)
 
 
-def get_ou_client(assume, profile):
+def get_org_client(assume, profile):
     if assume:
         sts_client = boto3.client('sts')
         response = sts_client.assume_role(RoleArn=assume, RoleSessionName='ListAccounts')
