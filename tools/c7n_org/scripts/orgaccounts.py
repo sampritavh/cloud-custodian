@@ -43,7 +43,7 @@ def main(role, ou, assume, profile, output, region, active):
     accounts.
     """
 
-    client = get_org_client(assume,profile)
+    client = get_org_client(assume, profile)
     accounts = []
     for path in ou:
         ou = get_ou_from_path(client, path)
@@ -82,7 +82,7 @@ def get_org_client(assume, profile):
             aws_access_key_id=response['Credentials']['AccessKeyId'],
             aws_secret_access_key=response['Credentials']['SecretAccessKey'],
             aws_session_token=response['Credentials']['SessionToken'],
-            )
+        )
     elif profile:
         session = boto3.Session(profile_name=profile)
         client = session.client('organizations')
@@ -145,8 +145,6 @@ def get_accounts_for_ou(client, ou, active, recursive=True):
                     results.append(a)
             else:
                 results.append(a)
-
-
     return results
 
 
