@@ -35,18 +35,19 @@ ROLE_TEMPLATE = "arn:aws:iam::{Id}:role/OrganizationAccountAccessRole"
 @click.option(
     '-f', '--output', type=click.File('w'),
     help="File to store the generated config (default stdout)")
-def main(role, ou, assume, profile, output, region):
+@click.option('-a', '--active', default=False, help="Get only active accounts", type=click.BOOL)
+def main(role, ou, assume, profile, output, region, active):
     """Generate a c7n-org accounts config file using AWS Organizations
 
     With c7n-org you can then run policies or arbitrary scripts across
     accounts.
     """
 
-    client = boto3.client('organizations')
+    client = get_ou_client(assume,profile)
     accounts = []
     for path in ou:
         ou = get_ou_from_path(client, path)
-        accounts.extend(get_accounts_for_ou(client, ou))
+        accounts.extend(get_accounts_for_ou(client, ou, active))
 
     results = []
     for a in accounts:
@@ -70,6 +71,24 @@ def main(role, ou, assume, profile, output, region):
             {'accounts': results},
             default_flow_style=False),
         file=output)
+
+
+def get_ou_client(assume, profile):
+    if assume:
+        sts_client = boto3.client('sts')
+        response = sts_client.assume_role(RoleArn=assume, RoleSessionName='ListAccounts')
+        client = boto3.client(
+            'organizations',
+            aws_access_key_id=response['Credentials']['AccessKeyId'],
+            aws_secret_access_key=response['Credentials']['SecretAccessKey'],
+            aws_session_token=response['Credentials']['SessionToken'],
+            )
+    elif profile:
+        session = boto3.Session(profile_name=profile)
+        client = session.client('organizations')
+    else:
+        client = boto3.client('organizations')
+    return client
 
 
 def get_ou_from_path(client, path):
@@ -109,7 +128,7 @@ def get_sub_ous(client, ou):
     return results
 
 
-def get_accounts_for_ou(client, ou, recursive=True):
+def get_accounts_for_ou(client, ou, active, recursive=True):
     results = []
     ous = [ou]
     if recursive:
@@ -121,7 +140,12 @@ def get_accounts_for_ou(client, ou, recursive=True):
             ParentId=ou['Id']).build_full_result().get(
                 'Accounts', []):
             a['Path'] = ou['Path']
-            results.append(a)
+            if active:
+                if a['Status'] == 'ACTIVE':
+                    results.append(a)
+            else:
+                results.append(a)
+
 
     return results
 
