@@ -14,9 +14,9 @@
 
 from __future__ import print_function
 
-import boto3
 import click
 import yaml
+from c7n.credentials import assumed_session, SessionFactory
 
 ROLE_TEMPLATE = "arn:aws:iam::{Id}:role/OrganizationAccountAccessRole"
 
@@ -43,7 +43,8 @@ def main(role, ou, assume, profile, output, region, active):
     accounts.
     """
 
-    client = get_org_client(assume, profile)
+    session = get_session(assume, 'c7n-org', profile, region)
+    client = session.client('organizations')
     accounts = []
     for path in ou:
         ou = get_ou_from_path(client, path)
@@ -73,22 +74,11 @@ def main(role, ou, assume, profile, output, region, active):
         file=output)
 
 
-def get_org_client(assume, profile):
-    if assume:
-        sts_client = boto3.client('sts')
-        response = sts_client.assume_role(RoleArn=assume, RoleSessionName='ListAccounts')
-        client = boto3.client(
-            'organizations',
-            aws_access_key_id=response['Credentials']['AccessKeyId'],
-            aws_secret_access_key=response['Credentials']['SecretAccessKey'],
-            aws_session_token=response['Credentials']['SessionToken'],
-        )
-    elif profile:
-        session = boto3.Session(profile_name=profile)
-        client = session.client('organizations')
+def get_session(role, session_name, profile, region):
+    if role:
+        return assumed_session(role, session_name, region=region)
     else:
-        client = boto3.client('organizations')
-    return client
+        return SessionFactory(region, profile)()
 
 
 def get_ou_from_path(client, path):
